@@ -36,6 +36,10 @@ var RESIZE_STEP = 25;
 var RESIZE_MAX = 100;
 var RESIZE_MIN = 25;
 var UPLOAD_IMAGE_PREVIEW = UPLOAD_IMAGE_POPUP.querySelector('.img-upload__preview img');
+var UPLOAD_IMAGE_FORM = document.querySelector('.img-upload__form');
+var UPLOAD_IMAGE_HASHTAG_INPUT = UPLOAD_IMAGE_FORM.querySelector('.text__hashtags');
+var UPLOAD_IMAGE_COMMENT_TEXTAREA = UPLOAD_IMAGE_FORM.querySelector('.text__description');
+var isBlockedEsc = false;
 
 var generateRandomNumber = function (min, max) {
   if (typeof max === 'undefined') {
@@ -62,7 +66,10 @@ var generatePictures = function (num) {
     pictures[i] = {
       url: 'photos/' + (i + 1) + '.jpg',
       likes: generateRandomNumber(LIKES_MIN, LIKES_MAX),
-      comments: [COMMENTS[generateRandomNumber(0, (COMMENTS.length - 1))], COMMENTS[generateRandomNumber(0, (COMMENTS.length - 1))]],
+      comments: [
+        COMMENTS[generateRandomNumber(0, (COMMENTS.length - 1))],
+        COMMENTS[generateRandomNumber(0, (COMMENTS.length - 1))]
+      ],
       description: DESCRIPTION[generateRandomNumber(0, (DESCRIPTION.length - 1))]
     };
   }
@@ -121,8 +128,16 @@ var closeBigPicturePopup = function () {
   document.removeEventListener('keydown', onBigPicturePopupEscPress);
 };
 
+var blockEsc = function () {
+  isBlockedEsc = true;
+};
+
+var unblockEsc = function () {
+  isBlockedEsc = false;
+};
+
 var onUploadPopupEscPress = function (evt) {
-  if (evt.keyCode === ESC_KEYCODE) {
+  if (evt.keyCode === ESC_KEYCODE && !isBlockedEsc) {
     closeUploadPopup();
   }
 };
@@ -154,6 +169,7 @@ var onEffectControlsClick = function (evt) {
 var resetUploadPopup = function () {
   UPLOAD_IMAGE_PREVIEW.removeAttribute('class'); // удаляем класс, чтобы сбросить наложенный эффект
   UPLOAD_IMAGE_PREVIEW.style.transform = 'none'; // сбрасываем размер картинки
+  UPLOAD_IMAGE_FORM.reset(); // сбрасываем состояние формы
 };
 
 var openUploadPopup = function () {
@@ -163,6 +179,10 @@ var openUploadPopup = function () {
   UPLOAD_IMAGE_EFFECT_CONTROLS.addEventListener('click', onEffectControlsClick);
   UPLOAD_IMAGE_RESIZE_CONTROL_MINUS.addEventListener('click', onResizeMinusClick);
   UPLOAD_IMAGE_RESIZE_CONTROL_PLUS.addEventListener('click', onResizePlusClick);
+  UPLOAD_IMAGE_HASHTAG_INPUT.addEventListener('focus', blockEsc);
+  UPLOAD_IMAGE_HASHTAG_INPUT.addEventListener('blur', unblockEsc);
+  UPLOAD_IMAGE_COMMENT_TEXTAREA.addEventListener('focus', blockEsc);
+  UPLOAD_IMAGE_COMMENT_TEXTAREA.addEventListener('blur', unblockEsc);
 };
 
 var closeUploadPopup = function () {
@@ -173,9 +193,62 @@ var closeUploadPopup = function () {
   UPLOAD_IMAGE_EFFECT_CONTROLS.removeEventListener('click', onEffectControlsClick);
   UPLOAD_IMAGE_RESIZE_CONTROL_MINUS.removeEventListener('click', onResizeMinusClick);
   UPLOAD_IMAGE_RESIZE_CONTROL_PLUS.removeEventListener('click', onResizePlusClick);
+  UPLOAD_IMAGE_HASHTAG_INPUT.removeEventListener('focus', blockEsc);
+  UPLOAD_IMAGE_HASHTAG_INPUT.removeEventListener('blur', unblockEsc);
+  UPLOAD_IMAGE_COMMENT_TEXTAREA.removeEventListener('focus', blockEsc);
+  UPLOAD_IMAGE_COMMENT_TEXTAREA.removeEventListener('blur', unblockEsc);
   resetUploadPopup();
+};
+
+var addRedBorder = function (element) {
+  element.style.border = '2px solid red';
+};
+
+var delRedBorder = function (element) {
+  element.style.border = '';
+};
+
+function validHashtag(value) {
+
+  if (value === '') {
+    return '';
+  }
+
+  var hashtagArray = value.split(' ');
+
+  for (var i = 0; i < hashtagArray.length; i++) {
+    if (hashtagArray[i][0] !== '#' || hashtagArray[i][0] === '#') {
+      return 'Хеш-тег должен начинаться с #, не может состоять только из одной #';
+    }
+    if (hashtagArray[i].length > 20) {
+      return 'Максимальная длина одного хэш-тега 20 символов, включая решётку';
+    }
+    if (hashtagArray.length > 5) {
+      return 'Нельзя указать больше пяти хэш-тегов';
+    }
+    for (var j = i + 1; j < hashtagArray.length; j++) {
+      if (hashtagArray[i].toLowerCase() === hashtagArray[j].toLowerCase()) {
+        return 'Хэш-теги не должны повторяться';
+      }
+    }
+  }
+  return '';
+}
+
+var onUploadFormSubmit = function (evt) {
+  var error = validHashtag(UPLOAD_IMAGE_HASHTAG_INPUT.value);
+  UPLOAD_IMAGE_HASHTAG_INPUT.setCustomValidity(error);
+  if (error !== '') {
+    evt.preventDefault();
+    addRedBorder(UPLOAD_IMAGE_HASHTAG_INPUT);
+  }
 };
 
 var pictures = generatePictures(PICTURES_NUM);
 renderPictures(pictures);
 UPLOAD_IMAGE_INPUT.addEventListener('change', openUploadPopup);
+UPLOAD_IMAGE_FORM.addEventListener('submit', onUploadFormSubmit);
+UPLOAD_IMAGE_HASHTAG_INPUT.addEventListener('click', function () {
+  delRedBorder(UPLOAD_IMAGE_HASHTAG_INPUT);
+  UPLOAD_IMAGE_HASHTAG_INPUT.setCustomValidity('');
+});
