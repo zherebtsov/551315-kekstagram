@@ -688,7 +688,7 @@ main {
 .scale__pin {
   position: absolute;
   top: 50%;
-  left: 20%;
+  left: 100%;
 
   width: 18px;
   height: 18px;
@@ -707,7 +707,7 @@ main {
 .scale__level {
   position: absolute;
 
-  width: 20%;
+  width: 100%;
   height: 100%;
 
   background-color: #ffe753;
