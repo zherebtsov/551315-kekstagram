@@ -18,8 +18,15 @@
     }));
   };
 
-  var pictures = window.data.generatePictures();
-  renderPictures(pictures);
+  var onError = function (error) {
+    window.toast.showMessage('Не удалось загрузить картинки (' + error + ')');
+  };
+
+  var onPicturesLoad = function (pictures) {
+    renderPictures(pictures);
+  };
+
+  window.backend.loadPictures(onPicturesLoad, onError);
   UPLOAD_IMAGE_INPUT.addEventListener('change', window.form.openUploadPopup);
 
 })();

@@ -21,7 +21,7 @@
   var UPLOAD_IMAGE_COMMENT_TEXTAREA = UPLOAD_IMAGE_FORM.querySelector('.text__description');
   var UPLOAD_IMAGE_SUBMIT_BUTTON = UPLOAD_IMAGE_FORM.querySelector('.img-upload__submit');
   // Scale effect
-  var EFFECT_ORIGION = 'none';
+  var EFFECT_DEFAULT = 'none';
   var SCALE_PIN = UPLOAD_IMAGE_FORM.querySelector('.scale__pin');
   var SCALE_CONTROL = UPLOAD_IMAGE_FORM.querySelector('.img-upload__scale');
   var RANGE_SCALE_INPUT = UPLOAD_IMAGE_FORM.querySelector('.scale__value');
@@ -91,7 +91,7 @@
     UPLOAD_IMAGE_POPUP.classList.remove('hidden');
     UPLOAD_IMAGE_CANCEL.addEventListener('click', closeUploadPopup);
     document.addEventListener('keydown', onUploadPopupEscPress);
-    setEffectOnImagePreview(EFFECT_ORIGION); // устанавливаем дефолтный эффект на превью
+    setEffectOnImagePreview(EFFECT_DEFAULT); // устанавливаем дефолтный эффект на превью
     UPLOAD_IMAGE_EFFECT_CONTROLS.addEventListener('click', onEffectControlsClick);
     UPLOAD_IMAGE_RESIZE_CONTROL_MINUS.addEventListener('click', onResizeMinusClick);
     UPLOAD_IMAGE_RESIZE_CONTROL_PLUS.addEventListener('click', onResizePlusClick);
@@ -159,11 +159,26 @@
     }
   };
 
-  UPLOAD_IMAGE_SUBMIT_BUTTON.addEventListener('click', onSubmitClick);
-  UPLOAD_IMAGE_HASHTAG_INPUT.addEventListener('input', function () {
-    delRedBorder(UPLOAD_IMAGE_HASHTAG_INPUT);
-    UPLOAD_IMAGE_HASHTAG_INPUT.setCustomValidity('');
-  });
+  var onFormSubmit = function (evt) {
+    evt.preventDefault();
+    var data = new FormData(UPLOAD_IMAGE_FORM);
+    window.backend.sendForm(data, onSuccess, onError);
+  };
+
+  var onSuccess = function () {
+    window.toast.showMessage('Форма успешно отправлена!');
+    closeUploadPopup();
+  };
+
+  var onCancelErrorClick = function () {
+    closeUploadPopup();
+    window.toast.hideError(onCancelErrorClick); // передаем эту же функцию для removeEventListener
+  };
+
+  var onError = function (error) {
+    window.toast.showMessage('Не удалось отправить форму (' + error + ')');
+    window.toast.showError(onCancelErrorClick);
+  };
 
   var changeScaleEffectValue = function (effect, value) {
     var styleFilter;
@@ -200,22 +215,12 @@
   };
 
   var showScaleEffectControl = function (effect) {
-    if (effect === EFFECT_ORIGION) {
+    if (effect === EFFECT_DEFAULT) {
       SCALE_CONTROL.classList.add('hidden');
     } else {
       SCALE_CONTROL.classList.remove('hidden');
     }
   };
-
-  SCALE_PIN.addEventListener('mousedown', function (evt) {
-    evt.preventDefault();
-    cursorStartX = evt.clientX;
-    cursorLeftLimit = -1;
-    cursorRightLimit = -1;
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
-  });
 
   var onMouseMove = function (moveEvt) {
     moveEvt.preventDefault();
@@ -251,6 +256,23 @@
     document.removeEventListener('mousemove', onMouseMove);
     document.removeEventListener('mouseup', onMouseUp);
   };
+
+  SCALE_PIN.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+    cursorStartX = evt.clientX;
+    cursorLeftLimit = -1;
+    cursorRightLimit = -1;
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  UPLOAD_IMAGE_SUBMIT_BUTTON.addEventListener('click', onSubmitClick);
+  UPLOAD_IMAGE_FORM.addEventListener('submit', onFormSubmit);
+  UPLOAD_IMAGE_HASHTAG_INPUT.addEventListener('input', function () {
+    delRedBorder(UPLOAD_IMAGE_HASHTAG_INPUT);
+    UPLOAD_IMAGE_HASHTAG_INPUT.setCustomValidity('');
+  });
 
   window.form = {
     openUploadPopup: openUploadPopup
