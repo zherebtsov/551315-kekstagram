@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var CLASS_HIDDEN = 'hidden';
+
   var generateRandomNumber = function (min, max) {
     if (typeof max === 'undefined') {
       max = min;
@@ -20,8 +22,22 @@
     return fragment;
   };
 
+  var showElement = function (element) {
+    if (element.classList.contains(CLASS_HIDDEN)) {
+      element.classList.remove(CLASS_HIDDEN);
+    }
+  };
+
+  var hideElement = function (element) {
+    if (!element.classList.contains(CLASS_HIDDEN)) {
+      element.classList.add(CLASS_HIDDEN);
+    }
+  };
+
   window.utils = {
     generateRandomNumber: generateRandomNumber,
-    createElements: createElements
+    createElements: createElements,
+    showElement: showElement,
+    hideElement: hideElement
   };
 })();

@@ -158,6 +158,21 @@
       </div>
     </section>
 
+    <div class="alert-wrapper">
+      <div class="alert hidden">
+        <span class="alert__text"></span>
+      </div>
+    </div>
+
+    <div class="img-upload__message img-upload__message--loading hidden">Загружаем...</div>
+
+    <div class="img-upload__message img-upload__message--error error hidden">Ошибка загрузки файла
+      <div class="error__links">
+        <a class="error__link error__link--repeat" href="#">Попробовать снова</a>
+        <a class="error__link error__link--cancel" href="#">Загрузить другой файл</a>
+      </div>
+    </div>
+
   </main>
 
   <footer class="page-footer container">
@@ -195,22 +210,14 @@
 
     <div class="img-upload__message img-upload__message--dragndrop hidden">Сюда!</div>
 
-    <div class="img-upload__message img-upload__message--loading hidden">Загружаем...</div>
-
     <div class="img-upload__message img-upload__message--processing hidden">Кексограмим...</div>
-
-    <div class="img-upload__message img-upload__message--error error hidden">Ошибка загрузки файла
-      <div class="error__links">
-        <a class="error__link" href="#">Попробовать снова</a>
-        <a class="error__link" href="#">Загрузить другой файл</a>
-      </div>
-    </div>
   </template>
 
   <script src="js/utils.js"></script>
-  <script src="js/data.js"></script>
   <script src="js/form.js"></script>
   <script src="js/picture.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/backend.js"></script>
   <script src="js/gallery.js"></script>
 
 </body>
