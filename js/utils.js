@@ -12,6 +12,28 @@
     return Math.floor(randomNum);
   };
 
+  var generateRandomUniqueNumbers = function (qty) {
+    var numbers = [];
+
+    for (var i = 0; i < qty; i++) {
+      numbers.push(i + 1);
+    }
+
+    return shuffleArray(numbers);
+  };
+
+  var compareRandom = function () {
+    return Math.random() - 0.5;
+  };
+
+  var shuffleArray = function (array) {
+    var result = array.slice();
+
+    result.sort(compareRandom);
+
+    return result;
+  };
+
   var createElements = function (data, elementTemplate, cbChangeElement) {
     var fragment = document.createDocumentFragment();
     data.forEach(function (item, index) {
@@ -22,15 +44,17 @@
     return fragment;
   };
 
-  var showElement = function (element) {
-    if (element.classList.contains(CLASS_HIDDEN)) {
-      element.classList.remove(CLASS_HIDDEN);
+  var showElement = function (element, classHide) {
+    var hide = classHide || CLASS_HIDDEN;
+    if (element.classList.contains(hide)) {
+      element.classList.remove(hide);
     }
   };
 
-  var hideElement = function (element) {
-    if (!element.classList.contains(CLASS_HIDDEN)) {
-      element.classList.add(CLASS_HIDDEN);
+  var hideElement = function (element, classHide) {
+    var hide = classHide || CLASS_HIDDEN;
+    if (!element.classList.contains(hide)) {
+      element.classList.add(hide);
     }
   };
 
@@ -38,6 +62,7 @@
     generateRandomNumber: generateRandomNumber,
     createElements: createElements,
     showElement: showElement,
-    hideElement: hideElement
+    hideElement: hideElement,
+    generateRandomUniqueNumbers: generateRandomUniqueNumbers
   };
 })();
