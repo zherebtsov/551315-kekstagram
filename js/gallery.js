@@ -1,13 +1,13 @@
 'use strict';
 
 (function () {
-  var UPLOAD_IMAGE_INPUT = document.querySelector('.img-upload__input');
-  var PICTURE_TEMPLATE = document.querySelector('template').content;
-  var PICTURES_CONTAINER = document.querySelector('.pictures');
+  var uploadImageInputElement = document.querySelector('.img-upload__input');
+  var pictureTemplateElement = document.querySelector('template').content;
+  var picturesContainerElement = document.querySelector('.pictures');
 
   var renderPictures = function (pictures) {
     removePictures();
-    PICTURES_CONTAINER.appendChild(window.utils.createElements(pictures, PICTURE_TEMPLATE, function (picture, index, element) {
+    picturesContainerElement.appendChild(window.utils.createElements(pictures, pictureTemplateElement, function (picture, index, element) {
       element.querySelector('.picture__img').src = picture.url;
       element.querySelector('.picture__stat--likes').textContent = picture.likes;
       element.querySelector('.picture__stat--comments').textContent = picture.comments.length;
@@ -20,10 +20,14 @@
   };
 
   var removePictures = function () {
-    var elements = PICTURES_CONTAINER.querySelectorAll('.picture__link');
-    elements.forEach(function (element) {
-      PICTURES_CONTAINER.removeChild(element);
+    var pictureElements = picturesContainerElement.querySelectorAll('.picture__link');
+    pictureElements.forEach(function (element) {
+      picturesContainerElement.removeChild(element);
     });
+  };
+
+  var clearUploadImageInput = function () {
+    uploadImageInputElement.value = '';
   };
 
   var onError = function (error) {
@@ -35,11 +39,25 @@
     window.filter.init(pictures);
   };
 
+  var onUploadImageChange = function () {
+    var file = uploadImageInputElement.files[0];
+    var fileReader = new FileReader();
+    fileReader.readAsDataURL(file);
+    fileReader.onload = function () {
+      window.form.setImagePreview(fileReader.result);
+      window.form.openUploadPopup();
+    };
+    fileReader.onerror = function (error) {
+      window.toast.showMessage('Error: ', error);
+    };
+  };
+
   window.backend.loadPictures(onPicturesLoad, onError);
-  UPLOAD_IMAGE_INPUT.addEventListener('change', window.form.openUploadPopup);
+  uploadImageInputElement.addEventListener('change', onUploadImageChange);
 
   window.gallery = {
-    render: renderPictures
+    render: renderPictures,
+    clearUploadImageInput: clearUploadImageInput
   };
 
 })();

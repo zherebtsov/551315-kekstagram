@@ -22,14 +22,12 @@
     return shuffleArray(numbers);
   };
 
-  var compareRandom = function () {
-    return Math.random() - 0.5;
-  };
-
   var shuffleArray = function (array) {
     var result = array.slice();
 
-    result.sort(compareRandom);
+    result.sort(function () {
+      return Math.random() - 0.5;
+    });
 
     return result;
   };

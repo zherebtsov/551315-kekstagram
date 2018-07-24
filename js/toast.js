@@ -1,23 +1,23 @@
 'use strict';
 
 (function () {
-  var MAIN = document.querySelector('main');
-  var ALERT = MAIN.querySelector('.alert');
-  var ALERT_TEXT = ALERT.querySelector('.alert__text');
-  var DISPLAY_TIME = 5000; // 5c
-  var PRELOADER = MAIN.querySelector('.img-upload__message--loading');
-  var ERROR = MAIN.querySelector('.img-upload__message--error');
-  var ERROR_REPEAT_BUTTON = ERROR.querySelector('.error__link--repeat');
-  var ERROR_CANCEL_BUTTON = ERROR.querySelector('.error__link--cancel');
+  var DISPLAY_TIME = 3500; // 3.5c
+  var mainElement = document.querySelector('main');
+  var alertElement = mainElement.querySelector('.alert');
+  var alertTextElement = alertElement.querySelector('.alert__text');
+  var preloaderElement = mainElement.querySelector('.img-upload__message--loading');
+  var errorElement = mainElement.querySelector('.img-upload__message--error');
+  var errorRepeatButtonElement = errorElement.querySelector('.error__link--repeat');
+  var errorCancelButtonElement = errorElement.querySelector('.error__link--cancel');
 
   var show = function (text) {
     hide();
-    ALERT_TEXT.textContent = text || '';
-    window.utils.showElement(ALERT);
+    alertTextElement.textContent = text || '';
+    window.utils.showElement(alertElement);
   };
 
   var hide = function () {
-    window.utils.hideElement(ALERT);
+    window.utils.hideElement(alertElement);
   };
 
   var showMessage = function (message) {
@@ -26,23 +26,27 @@
   };
 
   var showPreloader = function () {
-    window.utils.showElement(PRELOADER);
+    window.utils.showElement(preloaderElement);
   };
 
   var hidePreloader = function () {
-    window.utils.hideElement(PRELOADER);
+    window.utils.hideElement(preloaderElement);
+  };
+
+  var onRepeatButtonClick = function () {
+    hideError();
   };
 
   var showError = function (onCancelClick) {
-    window.utils.showElement(ERROR);
-    ERROR_REPEAT_BUTTON.addEventListener('click', hideError);
-    ERROR_CANCEL_BUTTON.addEventListener('click', onCancelClick);
+    window.utils.showElement(errorElement);
+    errorRepeatButtonElement.addEventListener('click', onRepeatButtonClick);
+    errorCancelButtonElement.addEventListener('click', onCancelClick);
   };
 
   var hideError = function (onCancelClick) {
-    window.utils.hideElement(ERROR);
-    ERROR_REPEAT_BUTTON.removeEventListener('click', hideError);
-    ERROR_CANCEL_BUTTON.removeEventListener('click', onCancelClick);
+    window.utils.hideElement(errorElement);
+    errorRepeatButtonElement.removeEventListener('click', onRepeatButtonClick);
+    errorCancelButtonElement.removeEventListener('click', onCancelClick);
   };
 
   window.toast = {

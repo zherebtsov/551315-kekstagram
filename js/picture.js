@@ -2,26 +2,43 @@
 
 (function () {
   var ESC_KEYCODE = 27;
-  var BIG_PICTURE_POPUP = document.querySelector('.big-picture');
-  var BIG_PICTURE_CANCEL = BIG_PICTURE_POPUP.querySelector('.big-picture__cancel');
+  var QTY_COMMENTS_ON_PAGE = 5;
+  var popupElement = document.querySelector('.big-picture');
+  var cancelButtonElement = popupElement.querySelector('.big-picture__cancel');
+  var commentsContainerElement = popupElement.querySelector('.social__comments');
+  var commentTemplateElement = popupElement.querySelector('.social__comment');
+  var commentsNumberElement = popupElement.querySelector('.comments-number');
+  var loadMoreButtonElement = popupElement.querySelector('.social__loadmore');
+  var AvatarImageIndex = {
+    FIRST: 1,
+    LAST: 6
+  };
+  var comments = [];
+  var renderedCommentsNumber;
 
-  var renderBigPicture = function (picture) {
-    var commentsContainer = BIG_PICTURE_POPUP.querySelector('.social__comments');
-    var commentTemplate = BIG_PICTURE_POPUP.querySelector('.social__comment');
-    BIG_PICTURE_POPUP.querySelector('.big-picture__img img').src = picture.url;
-    BIG_PICTURE_POPUP.querySelector('.likes-count').textContent = picture.likes;
-    BIG_PICTURE_POPUP.querySelector('.comments-count').textContent = picture.comments.length;
-    BIG_PICTURE_POPUP.querySelector('.social__caption').textContent = picture.description;
-    commentsContainer.textContent = ''; // очищаем контейнер с комментами
-    commentsContainer.appendChild(window.utils.createElements(picture.comments, commentTemplate, function (comment, index, element) {
-      element.querySelector('.social__picture').src = 'img/avatar-' + window.utils.generateRandomNumber(1, 6) + '.svg';
+  var renderComments = function (commentsData) {
+    renderedCommentsNumber = commentsData.length;
+    commentsNumberElement.textContent = renderedCommentsNumber;
+    commentsContainerElement.textContent = ''; // очищаем контейнер с комментами
+    commentsContainerElement.appendChild(window.utils.createElements(commentsData, commentTemplateElement, function (comment, index, element) {
+      element.querySelector('.social__picture')
+        .src = 'img/avatar-' + window.utils.generateRandomNumber(AvatarImageIndex.FIRST, AvatarImageIndex.LAST) + '.svg';
       element.querySelector('.social__text').textContent = comment;
       return element;
     }));
 
-    // Скрываем счетчик комментариев и кнопку подгрузки
-    BIG_PICTURE_POPUP.querySelector('.social__comment-count').classList.add('visually-hidden');
-    BIG_PICTURE_POPUP.querySelector('.social__loadmore').classList.add('visually-hidden');
+    if (comments.length === renderedCommentsNumber) {
+      window.utils.hideElement(loadMoreButtonElement);
+    }
+  };
+
+  var renderBigPicture = function (picture) {
+    comments = picture.comments;
+    popupElement.querySelector('.big-picture__img img').src = picture.url;
+    popupElement.querySelector('.likes-count').textContent = picture.likes;
+    popupElement.querySelector('.comments-count').textContent = picture.comments.length;
+    popupElement.querySelector('.social__caption').textContent = picture.description;
+    renderComments(comments.slice(0, QTY_COMMENTS_ON_PAGE));
   };
 
   var onBigPicturePopupEscPress = function (evt) {
@@ -30,17 +47,35 @@
     }
   };
 
+  var onCancelBigPictureClick = function () {
+    closeBigPicturePopup();
+  };
+
   var openBigPicturePopup = function (picture) {
     renderBigPicture(picture);
-    BIG_PICTURE_POPUP.classList.remove('hidden');
-    BIG_PICTURE_CANCEL.addEventListener('click', closeBigPicturePopup);
+    window.utils.showElement(popupElement);
+    cancelButtonElement.addEventListener('click', onCancelBigPictureClick);
     document.addEventListener('keydown', onBigPicturePopupEscPress);
+    loadMoreButtonElement.addEventListener('click', onLoadMoreClick);
   };
 
   var closeBigPicturePopup = function () {
-    BIG_PICTURE_POPUP.classList.add('hidden');
-    BIG_PICTURE_CANCEL.removeEventListener('click', closeBigPicturePopup);
+    window.utils.hideElement(popupElement);
+    cancelButtonElement.removeEventListener('click', onCancelBigPictureClick);
     document.removeEventListener('keydown', onBigPicturePopupEscPress);
+    loadMoreButtonElement.removeEventListener('click', onLoadMoreClick);
+    window.utils.showElement(loadMoreButtonElement);
+  };
+
+  var onLoadMoreClick = function () {
+    if (comments.length > renderedCommentsNumber) {
+      var newRenderedCommentsNumber = renderedCommentsNumber + QTY_COMMENTS_ON_PAGE;
+      if (comments.length > newRenderedCommentsNumber) {
+        renderComments(comments.slice(0, newRenderedCommentsNumber));
+      } else {
+        renderComments(comments);
+      }
+    }
   };
 
   window.picture = {

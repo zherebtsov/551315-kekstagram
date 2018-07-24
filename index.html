@@ -33,7 +33,14 @@
           <form class="img-upload__form" id="upload-select-image" method="post" enctype="multipart/form-data" autocomplete="off">
 
             <fieldset class="img-upload__start">
-              <input type="file" id="upload-file" class="img-upload__input visually-hidden" name="filename" required>
+              <input
+                type="file"
+                id="upload-file"
+                class="img-upload__input visually-hidden"
+                name="filename"
+                accept=".jpg, .jpeg, .png"
+                required
+              >
               <label for="upload-file" class="img-upload__label img-upload__control">Загрузить</label>
             </fieldset>
 
@@ -136,7 +143,9 @@
             <p class="social__caption">Тестим новую камеру! =)</p>
             <p class="social__likes">Нравится <span class="likes-count">356</span></p>
           </div>
-          <div class="social__comment-count">5 из <span class="comments-count">125</span> комментариев</div>
+          <div class="social__comment-count">
+            <span class="comments-number">5</span> из <span class="comments-count">125</span> комментариев
+          </div>
           <ul class="social__comments">
             <li class="social__comment">
               <img class="social__picture" src="img/avatar-4.svg" alt="Аватар комментатора фотографии" width="35" height="35">
@@ -214,6 +223,7 @@
   <script src="js/picture.js"></script>
   <script src="js/toast.js"></script>
   <script src="js/backend.js"></script>
+  <script src="js/debounce.js"></script>
   <script src="js/filter.js"></script>
   <script src="js/gallery.js"></script>
 
